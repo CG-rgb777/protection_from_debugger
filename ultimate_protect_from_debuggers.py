@@ -422,6 +422,9 @@ def protection_started_check():
             if not p9.is_alive():
                 protection_started_num = 0
                 sys.exit(1)
+            if not p10.is_alive():
+                protection_started_num = 0
+                sys.exit(1)
         except Exception:
             sys.exit(1)
 
