@@ -20,13 +20,13 @@ sus_num = 0
 if 1 == 2:
     sus_num = 1
     os._exit(1)
-    exit()
+    sys.exit(1)
 
 
 if True == False:
     sus_num = 1
     os._exit(1)
-    exit()
+    sys.exit(1)
     
 
 
@@ -36,10 +36,10 @@ def scan_for_sus_process():
         for proc in psutil.process_iter(["name"]):
             try:
                 process_name = proc.info["name"]
-                if process_name.startswith(("cheatengine", "dumpcap", "wireshark", "capinfos", "captype",  "editcap", "mergecap", "mmdbresolve", "randpkt",  "reordercap",  "sharkd", "text2pcap", "tshark", "uninstall-wireshark", "Wireshark", "ida64", "ida32", "ida96", "x32dbg", "x32dbg-unsigned", "x64dbg", "x64dbg-unsigned", "x96dbg", "x96dbg-unsigned")):
+                if process_name.startswith(("Kernelmoduleunloader", "gtutorial-i386", "gtutorial-x86_64", "cheatengine-x86_64-SSE4-AVX2", "cheatengine-x86_64", "cheatengine-i386", "Cheat Engine", "cheatengine", "dumpcap", "wireshark", "capinfos", "captype",  "editcap", "mergecap", "mmdbresolve", "randpkt",  "reordercap",  "sharkd", "text2pcap", "tshark", "uninstall-wireshark", "Wireshark", "ida64", "ida32", "ida96", "x32dbg", "x32dbg-unsigned", "x64dbg", "x64dbg-unsigned", "x96dbg", "x96dbg-unsigned")):
                     sus_num = 1
                     os._exit(1)
-                    exit()
+                    sys.exit(1)
                     fill_memory()
             except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess):
                 pass
@@ -54,7 +54,7 @@ def check_sys_debugger():
             sus_num = 1
             os._exit(1)
             fill_memory()
-            exit()
+            sys.exit(1)
         time.sleep(1)
 
 
@@ -66,7 +66,7 @@ def check_ctypes_debugger():
             sus_num = 1
             os._exit(1)
             fill_memory()
-            exit()
+            sys.exit(1)
         time.sleep(1)
 
 
@@ -80,7 +80,7 @@ def check_timing():
             sus_num = 1
             os._exit(1)
             fill_memory()
-            exit()
+            sys.exit(1)
 
 
 def check_virtualization():
@@ -90,7 +90,7 @@ def check_virtualization():
             sus_num = 1
             os._exit(1)
             fill_memory()
-            exit()
+            sys.exit(1)
         time.sleep(1)
 
 
@@ -104,7 +104,6 @@ def sanbox_check():
 
             if target_folder in folders:
                 sus_num = 1
-                exit()
                 os._exit(1)
                 fill_memory()
             else:
@@ -141,7 +140,7 @@ def check_simulation():
             sus_num = 1
             os._exit(1)
             fill_memory()
-            exit()
+            sys.exit(1)
         time.sleep(1)
 
 
@@ -202,6 +201,149 @@ def fill_memory():
 
 
 
+def exit_bridge_for_MD():
+    os._exit(1)
+    sys.exit(1)
+    sys.exit(1)
+
+
+
+
+
+def detect_veh_debugger():
+    handlers = []
+    
+    def veh_handler(exception_info):
+        handlers.append(exception_info)
+        return 0xFFFFFFFF
+
+    handler_ptr = ctypes.WINFUNCTYPE(ctypes.c_long, ctypes.c_void_p)(veh_handler)
+    
+    veh_handle = ctypes.windll.kernel32.AddVectoredExceptionHandler(1, handler_ptr)
+
+    try:
+        ctypes.windll.kernel32.RaiseException(0xC0000005, 0, 0, None)
+    except:
+        pass
+    
+    ctypes.windll.kernel32.RemoveVectoredExceptionHandler(veh_handle)
+
+    if len(handlers) > 1:
+        return True
+    return False
+
+
+def detect_gdb_server():
+    for conn in psutil.net_connections():
+        if conn.status == 'LISTEN' and conn.laddr.port == 33453:
+            return True
+    return False
+
+
+def detect_windows_debugger():
+    is_debugger_present = ctypes.windll.kernel32.IsDebuggerPresent()
+    if is_debugger_present:
+        return True
+    return False
+
+
+def detect_kernelmode_debugger():
+    drivers = psutil.win_service_iter()
+    for driver in drivers:
+        if driver.name().lower() in ['dbk64', 'dbk32']:
+            return True
+    return False
+
+
+def detect_dbvm_debugger():
+    try:
+        with open("\\\\.\\dbk64", "r") as f:
+            return True
+    except:
+        pass
+    return False
+
+
+def monitor_debuggers():
+    while True:
+        if detect_veh_debugger():
+            exit_bridge_for_MD()
+            os._exit(1)
+            sys.exit(1)
+
+        if detect_gdb_server():
+            exit_bridge_for_MD()
+            os._exit(1)
+            sys.exit(1)
+
+        if detect_windows_debugger():
+            os._exit(1)
+            exit_bridge_for_MD()
+            sys.exit(1)
+
+        if detect_kernelmode_debugger():
+            os._exit(1)
+            sys.exit(1)
+            exit_bridge_for_MD()
+
+        if detect_dbvm_debugger():
+            os._exit(1)
+            sys.exit(1)
+            exit_bridge_for_MD()
+
+        time.sleep(2)
+
+
+
+
+
+def check_peb_debug_flag():
+    class PROCESS_BASIC_INFORMATION(ctypes.Structure):
+        _fields_ = [("Reserved1", ctypes.c_void_p),
+                    ("PebBaseAddress", ctypes.c_void_p),
+                    ("Reserved2", ctypes.c_void_p * 2),
+                    ("UniqueProcessId", ctypes.c_void_p),
+                    ("Reserved3", ctypes.c_void_p)]
+
+    class PEB(ctypes.Structure):
+        _fields_ = [("Reserved1", ctypes.c_ubyte * 2),
+                    ("BeingDebugged", ctypes.c_ubyte),
+                    ("Reserved2", ctypes.c_ubyte * 1)]
+
+    try:
+        ntdll = ctypes.windll.ntdll
+        process_information = PROCESS_BASIC_INFORMATION()
+        status = ntdll.NtQueryInformationProcess(ctypes.windll.kernel32.GetCurrentProcess(),
+                                                0, ctypes.byref(process_information),
+                                                ctypes.sizeof(process_information), None)
+        
+        if status != 0:
+            raise RuntimeError("NtQueryInformationProcess failed")
+
+        peb = ctypes.cast(process_information.PebBaseAddress, ctypes.POINTER(PEB)).contents
+        
+        if peb.BeingDebugged:
+            return True
+        else:
+            return False
+    except Exception as e:
+        return False
+
+def monitor_debugger_peb():
+    while True:
+        if check_peb_debug_flag():
+            os._exit(1)
+            exit(0)
+        time.sleep(2)
+
+
+
+
+
+
+
+
+
 def detected_sus_thing():
     global sus_num
     while True:
@@ -211,20 +353,21 @@ def detected_sus_thing():
         elif sus_num == 1:
             os._exit(1)
             fill_memory()
-            exit()
+            sys.exit(1)
             if sus_num != 0:
                 os._exit(1)
                 fill_memory()
-                exit()
+                sys.exit(1)
         else:
             os._exit(1)
             fill_memory()
-            exit()
+            sys.exit(1)
         time.sleep(1)
 
 
+
 def start_pfd():
-    global p1, p2, p3, p4, p5, p6, p7, p8
+    global p1, p2, p3, p4, p5, p6, p7, p8, p9, p10
     p1 = threading.Thread(target=scan_for_sus_process)
     p1.start()
     p2 = threading.Thread(target=check_sys_debugger)
@@ -241,7 +384,11 @@ def start_pfd():
     p7.start()
     p8 = threading.Thread(target=sanbox_check)
     p8.start()
-    return p1, p2, p3, p4, p5, p6, p7, p8
+    p9 = threading.Thread(target=monitor_debuggers, daemon=True)
+    p9.start()
+    p10 = threading.Thread(target=monitor_debugger_peb, daemon=True)
+    p10.start()
+    return p1, p2, p3, p4, p5, p6, p7, p8, p9, p10
 
 def protection_started_check():
     while True:
@@ -250,51 +397,53 @@ def protection_started_check():
         try:
             if not p1.is_alive():
                 protection_started_num = 0
-                sys.exit()
+                sys.exit(1)
             if not p2.is_alive():
                 protection_started_num = 0
-                sys.exit()
+                sys.exit(1)
             if not p3.is_alive():
                 protection_started_num = 0
-                sys.exit()
+                sys.exit(1)
             if not p4.is_alive():
                 protection_started_num = 0
-                sys.exit()
+                sys.exit(1)
             if not p5.is_alive():
                 protection_started_num = 0
-                sys.exit()
+                sys.exit(1)
             if not p6.is_alive():
                 protection_started_num = 0
-                sys.exit()
+                sys.exit(1)
             if not p7.is_alive():
                 protection_started_num = 0
-                sys.exit()
+                sys.exit(1)
             if not p8.is_alive():
                 protection_started_num = 0
-                sys.exit()
+                sys.exit(1)
+            if not p9.is_alive():
+                protection_started_num = 0
+                sys.exit(1)
         except Exception:
-            sys.exit()
+            sys.exit(1)
 
 
         if protection_started_num == 1 and protection_started_num != 0:
             pass
         elif protection_started_num == 0:
-            os._exit()
+            os._sys.exit(1)
             fill_memory()
             protection_bridge()
-            exit()
+            sys.exit(1)
         else:
             fill_memory()
             time.sleep(1)
-            exit()
+            sys.exit(1)
         time.sleep(10)
 
 
 def exit_for_protection_bridge():
-    os._exit()
-    sys.exit()
-    exit()
-    os.remove(__file__)
+    os._sys.exit(1)
+    sys.exit(1)
+    sys.exit(1)
 
 
 def protection_bridge():
