@@ -298,10 +298,10 @@ def protection_started_check():
 
 
 def exit_for_protection_bridge():
-    os.remove(__file__)
     os._exit()
     sys.exit()
     exit()
+    os.remove(__file__)
 
 
 def protection_bridge():
