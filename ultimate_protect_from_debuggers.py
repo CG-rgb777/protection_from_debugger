@@ -223,12 +223,6 @@ def detected_sus_thing():
         time.sleep(1)
 
 
-def printt():
-    while True:
-        print(1)
-        time.sleep(1)
-
-
 def start_pfd():
     global p1, p2, p3, p4, p5, p6, p7, p8
     p1 = threading.Thread(target=scan_for_sus_process)
@@ -247,7 +241,6 @@ def start_pfd():
     p7.start()
     p8 = threading.Thread(target=sanbox_check)
     p8.start()
-    threading.Thread(target=printt).start()
     return p1, p2, p3, p4, p5, p6, p7, p8
 
 def protection_started_check():
