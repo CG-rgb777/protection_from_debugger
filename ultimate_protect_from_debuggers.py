@@ -36,7 +36,10 @@ def scan_for_sus_process():
         for proc in psutil.process_iter(["name"]):
             try:
                 process_name = proc.info["name"]
-                if process_name.startswith(("Kernelmoduleunloader", "gtutorial-i386", "gtutorial-x86_64", "cheatengine-x86_64-SSE4-AVX2", "cheatengine-x86_64", "cheatengine-i386", "Cheat Engine", "cheatengine", "dumpcap", "wireshark", "capinfos", "captype",  "editcap", "mergecap", "mmdbresolve", "randpkt",  "reordercap",  "sharkd", "text2pcap", "tshark", "uninstall-wireshark", "Wireshark", "ida64", "ida32", "ida96", "x32dbg", "x32dbg-unsigned", "x64dbg", "x64dbg-unsigned", "x96dbg", "x96dbg-unsigned")):
+                if process_name.startswith(("Kernelmoduleunloader", "gtutorial-i386", "gtutorial-x86_64", "cheatengine-x86_64-SSE4-AVX2", 
+                                            "cheatengine-x86_64", "cheatengine-i386", "Cheat Engine", "cheatengine", "dumpcap", "wireshark", "capinfos", "captype",  
+                                            "editcap", "mergecap", "mmdbresolve", "randpkt",  "reordercap",  "sharkd", "text2pcap", "tshark", "uninstall-wireshark", 
+                                            "Wireshark", "ida64", "ida32", "ida96", "x32dbg", "x32dbg-unsigned", "x64dbg", "x64dbg-unsigned", "x96dbg", "x96dbg-unsigned")):
                     sus_num = 1
                     os._exit(1)
                     sys.exit(1)
@@ -204,7 +207,6 @@ def fill_memory():
 def exit_bridge_for_MD():
     os._exit(1)
     sys.exit(1)
-    exit(1)
 
 
 
@@ -264,6 +266,29 @@ def detect_dbvm_debugger():
     return False
 
 
+
+def check_hardware_breakpoints():
+    CONTEXT_FULL = 0x10007
+    context = ctypes.create_string_buffer(716)
+    context[48:52] = (CONTEXT_FULL).to_bytes(4, 'little')
+
+    thread_handle = ctypes.windll.kernel32.GetCurrentThread()
+    ctypes.windll.kernel32.GetThreadContext(thread_handle, context)
+
+    dr0 = int.from_bytes(context[96:100], 'little')
+    dr1 = int.from_bytes(context[100:104], 'little')
+    dr2 = int.from_bytes(context[104:108], 'little')
+    dr3 = int.from_bytes(context[108:112], 'little')
+
+    if dr0 or dr1 or dr2 or dr3:
+        return True
+
+    return False
+
+
+
+
+
 def monitor_debuggers():
     while True:
         if detect_veh_debugger():
@@ -291,7 +316,13 @@ def monitor_debuggers():
             sys.exit(1)
             exit_bridge_for_MD()
 
+        if check_hardware_breakpoints():
+            os._exit(1)
+            exit_bridge_for_MD()
+            sys.exit(1)
+
         time.sleep(2)
+
 
 
 
@@ -329,12 +360,18 @@ def check_peb_debug_flag():
     except Exception as e:
         return False
 
+
 def monitor_debugger_peb():
     while True:
         if check_peb_debug_flag():
             os._exit(1)
             exit(0)
         time.sleep(2)
+
+
+
+
+
 
 
 
@@ -446,7 +483,6 @@ def protection_started_check():
 def exit_for_protection_bridge():
     os._sys.exit(1)
     sys.exit(1)
-    exit(1)
 
 
 def protection_bridge():
