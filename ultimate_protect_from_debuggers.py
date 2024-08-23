@@ -446,7 +446,7 @@ def protection_started_check():
 def exit_for_protection_bridge():
     os._sys.exit(1)
     sys.exit(1)
-    sys.exit(1)
+    exit(1)
 
 
 def protection_bridge():
