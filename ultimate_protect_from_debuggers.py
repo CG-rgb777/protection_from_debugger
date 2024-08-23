@@ -204,7 +204,7 @@ def fill_memory():
 def exit_bridge_for_MD():
     os._exit(1)
     sys.exit(1)
-    sys.exit(1)
+    exit(1)
 
 
 
