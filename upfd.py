@@ -8,9 +8,6 @@ import platform
 
 
 
-#Everything below should be in the code to have maximum protection and delete all comments if you use it.
-
-
 exec = None
 eval = None
 
