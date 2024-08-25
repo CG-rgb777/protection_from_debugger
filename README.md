@@ -8,3 +8,5 @@ doing so may activate protection that shuts down your computer or fills RAM with
 
 Protection against Windows debugger, VEH debugger, Windows Sandbox. 
 But in cheat engine there is a function at activation of which Windows debugger is hidden and from this I have not yet invented protection.
+
+To enable protection in your project, simply import the upfd file and call the upfd.start() function
