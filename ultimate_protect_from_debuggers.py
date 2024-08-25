@@ -90,6 +90,8 @@ def check_timing():
             sys.exit(1)
 
 
+
+
 def check_virtualization():
     global sus_num
     while True:
@@ -292,111 +294,6 @@ def check_hardware_breakpoints():
 
 
 
-def check_nt_global_flag():
-    ntdll = ctypes.windll.ntdll
-    kernel32 = ctypes.windll.kernel32
-    process_basic_information = ctypes.create_string_buffer(48)
-    ntdll.NtQueryInformationProcess(
-        kernel32.GetCurrentProcess(),
-        0,
-        ctypes.byref(process_basic_information),
-        ctypes.sizeof(process_basic_information),
-        None
-    )
-    offset = 0x68 if sys.maxsize > 2**32 else 0x18
-    nt_global_flag = ctypes.cast(
-        ctypes.byref(process_basic_information, offset), ctypes.POINTER(ctypes.c_uint32)).contents.value
-    return nt_global_flag & 0x70 != 0
-
-
-def trap_flag_check():
-    ntdll = ctypes.windll.ntdll
-    kernel32 = ctypes.windll.kernel32
-    def single_step_handler(dwExceptionCode, lpException):
-        ntdll = ctypes.windll.ntdll
-        kernel32 = ctypes.windll.kernel32
-        if dwExceptionCode == 0x80000004:
-            return 1
-        return 0
-    prev_handler = kernel32.SetUnhandledExceptionFilter(ctypes.WINFUNCTYPE(ctypes.c_int, ctypes.c_int, ctypes.c_void_p)(single_step_handler))
-    try:
-        ctypes.windll.kernel32.RtlCaptureContext(None)
-    except Exception:
-        pass
-    kernel32.SetUnhandledExceptionFilter(prev_handler)
-    return False
-
-
-def check_debug_object():
-    ntdll = ctypes.windll.ntdll
-    kernel32 = ctypes.windll.kernel32
-    process_information_class = 0x1e
-    debug_handle = ctypes.c_void_p()
-    status = ntdll.NtQueryInformationProcess(
-        kernel32.GetCurrentProcess(),
-        process_information_class,
-        ctypes.byref(debug_handle),
-        ctypes.sizeof(debug_handle),
-        None
-    )
-    return debug_handle.value is not None
-
-
-def seh_check():
-    ntdll = ctypes.windll.ntdll
-    kernel32 = ctypes.windll.kernel32
-    def handler(dwExceptionCode, lpException):
-        return 0 if dwExceptionCode == 0x80000003 else 1
-    prev_handler = kernel32.SetUnhandledExceptionFilter(ctypes.WINFUNCTYPE(ctypes.c_int, ctypes.c_int, ctypes.c_void_p)(handler))
-    try:
-        ctypes.windll.kernel32.RaiseException(0x80000003, 0, 0, None)
-    except Exception:
-        pass
-    kernel32.SetUnhandledExceptionFilter(prev_handler)
-    return False
-
-
-def handle_tracing():
-    ntdll = ctypes.windll.ntdll
-    kernel32 = ctypes.windll.kernel32
-    handles = kernel32.GetCurrentThread()
-    handle_count = ctypes.c_uint()
-    kernel32.GetProcessHandleCount(handles, ctypes.byref(handle_count))
-    return handle_count.value > 100
-
-
-def anti_debug_monitor2():
-    while True:
-        if check_nt_global_flag():
-            exit_bridge_for_MD()
-            os._exit(1)
-            sys.exit(1)
-        elif trap_flag_check():
-            os._exit(1)
-            exit_bridge_for_MD()
-            sys.exit(1)
-        elif check_debug_object():
-            exit_bridge_for_MD()
-            sys.exit(1)
-            os._exit(1)
-        elif seh_check():
-            os._exit(1)
-            exit_bridge_for_MD()
-            sys.exit(1)
-        elif handle_tracing():
-            os._exit(1)
-            sys.exit(1)
-            exit_bridge_for_MD()
-        else:
-            time.sleep(1)
-        
-        time.sleep(5)
-
-
-
-
-
-
 
 def monitor_debuggers():
     while True:
@@ -519,7 +416,7 @@ def detected_sus_thing():
 
 
 def start_pfd():
-    global p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11
+    global p1, p2, p3, p4, p5, p6, p7, p8, p9, p10
     p1 = threading.Thread(target=scan_for_sus_process)
     p1.start()
     p2 = threading.Thread(target=check_sys_debugger)
@@ -540,9 +437,9 @@ def start_pfd():
     p9.start()
     p10 = threading.Thread(target=monitor_debugger_peb, daemon=True)
     p10.start()
-    p11 = threading.Thread(target=anti_debug_monitor2)
-    p11.start()
-    return p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11
+
+
+
 
 def protection_started_check():
     while True:
@@ -577,9 +474,6 @@ def protection_started_check():
                 protection_started_num = 0
                 sys.exit(1)
             if not p10.is_alive():
-                protection_started_num = 0
-                sys.exit(1)
-            if not p11.is_alive():
                 protection_started_num = 0
                 sys.exit(1)
         except Exception:
