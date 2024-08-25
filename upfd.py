@@ -103,7 +103,7 @@ def check_virtualization():
         time.sleep(1)
 
 
-def sanbox_check():
+def sanbox_user_check():
         global sus_num
         directory_path = r"C:\\Users"
         target_folder = "WDAGUtilityAccount"
@@ -416,7 +416,6 @@ def detected_sus_thing():
 
 
 
-
 def start_pfd():
     global p1, p2, p3, p4, p5, p6, p7, p8, p9, p10
     p1 = threading.Thread(target=scan_for_sus_process)
@@ -427,14 +426,14 @@ def start_pfd():
     p3.start()
     p4 = threading.Thread(target=check_timing)
     p4.start()
-    p5 = threading.Thread(target=check_virtualization)
-    p5.start()
     p6 = threading.Thread(target=check_simulation)
     p6.start()
     p7 = threading.Thread(target=detected_sus_thing)
     p7.start()
-    p8 = threading.Thread(target=sanbox_check)
+    p8 = threading.Thread(target=sanbox_user_check)
     p8.start()
+    p5 = threading.Thread(target=check_virtualization)
+    p5.start()
     p9 = threading.Thread(target=monitor_debuggers, daemon=True)
     p9.start()
     p10 = threading.Thread(target=monitor_debugger_peb, daemon=True)
@@ -544,14 +543,17 @@ def start_last_wall():
     threading.Thread(target=last_wall).start()
 
 
+def start():
+    global protect_check_thread
+    start_pfd()
+    os.system("cls")
+    protect_check_thread = threading.Thread(target=protection_started_check)
+    protect_check_thread.start()
+    start_last_wall()
+    os.system("cls")
 
-start_pfd()
-protect_check_thread =  threading.Thread(target=protection_started_check)
-protect_check_thread.start()
-start_last_wall()
 
 
 
 if __name__ == "__main__":
-    #You can add yours here after everything that is written here
     sus_num = 0
