@@ -372,13 +372,15 @@ def check_peb_debug_flag():
         return False
 
 
+
+
 def monitor_debugger_peb():
     while True:
         if check_peb_debug_flag():
             os._exit(1)
             exit(0)
+            exit_bridge_for_MD()
         time.sleep(2)
-
 
 
 
