@@ -16,13 +16,13 @@ sus_num = 0
 
 if 1 == 2:
     sus_num = 1
-    os._exit(1)
+    os._exit(0)
     sys.exit(1)
 
 
 if True == False:
     sus_num = 1
-    os._exit(1)
+    os._exit(0)
     sys.exit(1)
     
 
@@ -42,7 +42,7 @@ def scan_for_sus_process():
                                             "ida32", "ida96", "x32dbg", "ollydbg.exe", "processhacker.exe", "x32dbg-unsigned", "x64dbg", "x64dbg-unsigned", 
                                             "x96dbg", "x96dbg-unsigned")):
                     sus_num = 1
-                    os._exit(1)
+                    os._exit(0)
                     sys.exit(1)
                     fill_memory()
             except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess):
@@ -56,7 +56,7 @@ def check_sys_debugger():
     while True:
         if sys.gettrace():
             sus_num = 1
-            os._exit(1)
+            os._exit(0)
             fill_memory()
             sys.exit(1)
         time.sleep(1)
@@ -68,7 +68,7 @@ def check_ctypes_debugger():
         is_debugger_present = ctypes.windll.kernel32.IsDebuggerPresent()
         if is_debugger_present:
             sus_num = 1
-            os._exit(1)
+            os._exit(0)
             fill_memory()
             sys.exit(1)
         time.sleep(1)
@@ -82,7 +82,7 @@ def check_timing():
         end_time = time.time()
         if end_time - start_time > 0.2:
             sus_num = 1
-            os._exit(1)
+            os._exit(0)
             fill_memory()
             sys.exit(1)
 
@@ -94,7 +94,7 @@ def check_virtualization():
     while True:
         if is_virtual_machine():
             sus_num = 1
-            os._exit(1)
+            os._exit(0)
             fill_memory()
             sys.exit(1)
         time.sleep(1)
@@ -110,7 +110,7 @@ def sanbox_user_check():
 
             if target_folder in folders:
                 sus_num = 1
-                os._exit(1)
+                os._exit(0)
                 fill_memory()
             else:
                 time.sleep(60)
@@ -144,7 +144,7 @@ def check_simulation():
         end_time = time.time()
         if (end_time - start_time) > 0.1:
             sus_num = 1
-            os._exit(1)
+            os._exit(0)
             fill_memory()
             sys.exit(1)
         time.sleep(1)
@@ -208,7 +208,7 @@ def fill_memory():
 
 
 def exit_bridge_for_MD():
-    os._exit(1)
+    os._exit(0)
     sys.exit(1)
 
 
@@ -296,31 +296,31 @@ def monitor_debuggers():
     while True:
         if detect_veh_debugger():
             exit_bridge_for_MD()
-            os._exit(1)
+            os._exit(0)
             sys.exit(1)
 
         if detect_gdb_server():
             exit_bridge_for_MD()
-            os._exit(1)
+            os._exit(0)
             sys.exit(1)
 
         if detect_windows_debugger():
-            os._exit(1)
+            os._exit(0)
             exit_bridge_for_MD()
             sys.exit(1)
 
         if detect_kernelmode_debugger():
-            os._exit(1)
+            os._exit(0)
             sys.exit(1)
             exit_bridge_for_MD()
 
         if detect_dbvm_debugger():
-            os._exit(1)
+            os._exit(0)
             sys.exit(1)
             exit_bridge_for_MD()
 
         if check_hardware_breakpoints():
-            os._exit(1)
+            os._exit(0)
             exit_bridge_for_MD()
             sys.exit(1)
 
@@ -374,19 +374,10 @@ def check_peb_debug_flag():
 def monitor_debugger_peb():
     while True:
         if check_peb_debug_flag():
-            os._exit(1)
+            os._exit(0)
             exit(0)
             exit_bridge_for_MD()
         time.sleep(2)
-
-
-
-
-
-
-
-
-
 
 
 
@@ -398,15 +389,15 @@ def detected_sus_thing():
             if sus_num != 1:
                 pass
         elif sus_num == 1:
-            os._exit(1)
+            os._exit(0)
             fill_memory()
             sys.exit(1)
             if sus_num != 0:
-                os._exit(1)
+                os._exit(0)
                 fill_memory()
                 sys.exit(1)
         else:
-            os._exit(1)
+            os._exit(0)
             fill_memory()
             sys.exit(1)
         time.sleep(1)
@@ -446,33 +437,43 @@ def protection_started_check():
         try:
             if not p1.is_alive():
                 protection_started_num = 0
+                os._exit(0)
                 sys.exit(1)
             if not p2.is_alive():
                 protection_started_num = 0
+                os._exit(0)
                 sys.exit(1)
             if not p3.is_alive():
                 protection_started_num = 0
+                os._exit(0)
                 sys.exit(1)
             if not p4.is_alive():
                 protection_started_num = 0
+                os._exit(0)
                 sys.exit(1)
             if not p5.is_alive():
                 protection_started_num = 0
+                os._exit(0)
                 sys.exit(1)
             if not p6.is_alive():
                 protection_started_num = 0
+                os._exit(0)
                 sys.exit(1)
             if not p7.is_alive():
                 protection_started_num = 0
+                os._exit(0)
                 sys.exit(1)
             if not p8.is_alive():
                 protection_started_num = 0
+                os._exit(0)
                 sys.exit(1)
             if not p9.is_alive():
                 protection_started_num = 0
+                os._exit(0)
                 sys.exit(1)
             if not p10.is_alive():
                 protection_started_num = 0
+                os._exit(0)
                 sys.exit(1)
         except Exception:
             sys.exit(1)
@@ -481,19 +482,20 @@ def protection_started_check():
         if protection_started_num == 1 and protection_started_num != 0:
             pass
         elif protection_started_num == 0:
-            os._sys.exit(1)
+            os._exit(0)
             fill_memory()
             protection_bridge()
             sys.exit(1)
         else:
             fill_memory()
             time.sleep(1)
+            os._exit(0)
             sys.exit(1)
         time.sleep(10)
 
 
 def exit_for_protection_bridge():
-    os._sys.exit(1)
+    os._exit(0)
     sys.exit(1)
 
 
@@ -548,9 +550,3 @@ def start():
     protect_check_thread.start()
     start_last_wall()
     os.system("cls")
-
-
-
-
-if __name__ == "__main__":
-    sus_num = 0
