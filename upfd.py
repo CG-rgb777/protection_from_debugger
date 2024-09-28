@@ -5,13 +5,11 @@ import os
 import sys
 import ctypes
 import platform
-
+import ctypes.wintypes as wintypes
 
 
 exec = None
 eval = None
-
-sus_num = 0
 
 
 if 1 == 2:
@@ -331,11 +329,6 @@ def monitor_debuggers():
 
 
 
-
-
-
-
-
 def check_peb_debug_flag():
     class PROCESS_BASIC_INFORMATION(ctypes.Structure):
         _fields_ = [("Reserved1", ctypes.c_void_p),
@@ -382,6 +375,7 @@ def monitor_debugger_peb():
 
 
 
+
 def detected_sus_thing():
     global sus_num
     while True:
@@ -404,28 +398,80 @@ def detected_sus_thing():
 
 
 
+
+
+kernel32_1 = ctypes.WinDLL('kernel32', use_last_error=True)
+
+ReadProcessMemory_proto = ctypes.WINFUNCTYPE(
+    wintypes.BOOL,
+    wintypes.HANDLE,
+    wintypes.LPCVOID,
+    wintypes.LPVOID,
+    wintypes.SIZE,
+    ctypes.POINTER(wintypes.SIZE)
+)
+
+
+ReadProcessMemory = ReadProcessMemory_proto(('ReadProcessMemory', kernel32_1))
+
+def ReadProcessMemory_hook(hProcess, lpBaseAddress, lpBuffer, nSize, lpNumberOfBytesRead):
+    global sus_num
+    current_pid = kernel32_1.GetCurrentProcessId()
+    process_id = kernel32_1.GetProcessId(hProcess)
+
+    if process_id != current_pid:
+        sus_num = 1
+        return False
+
+    return ReadProcessMemory(hProcess, lpBaseAddress, lpBuffer, nSize, lpNumberOfBytesRead)
+
+
+def set_hook():
+    try:
+        ctypes.windll.kernel32_1.ReadProcessMemory = ReadProcessMemory_hook
+        ctypes.windll.kernel32.ReadProcessMemory = ReadProcessMemory_hook
+    except:
+        pass
+
+
+def monitor_memory_access():
+    while True:
+        set_hook()
+        time.sleep(1)
+
+
+
+
+
+
+
+
 def start_pfd():
-    global p1, p2, p3, p4, p5, p6, p7, p8, p9, p10
-    p1 = threading.Thread(target=scan_for_sus_process)
+    global p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11
+    p1 = threading.Thread(target=scan_for_sus_process, daemon=True)
     p1.start()
-    p2 = threading.Thread(target=check_sys_debugger)
+    p2 = threading.Thread(target=check_sys_debugger, daemon=True)
     p2.start()
-    p3 = threading.Thread(target=check_ctypes_debugger)
+    p3 = threading.Thread(target=check_ctypes_debugger, daemon=True)
     p3.start()
-    p4 = threading.Thread(target=check_timing)
+    p4 = threading.Thread(target=check_timing, daemon=True)
     p4.start()
-    p6 = threading.Thread(target=check_simulation)
+    p6 = threading.Thread(target=check_simulation, daemon=True)
     p6.start()
-    p7 = threading.Thread(target=detected_sus_thing)
+    p7 = threading.Thread(target=detected_sus_thing, daemon=True)
     p7.start()
-    p8 = threading.Thread(target=sanbox_user_check)
+    p8 = threading.Thread(target=sanbox_user_check, daemon=True)
     p8.start()
-    p5 = threading.Thread(target=check_virtualization)
+    p5 = threading.Thread(target=check_virtualization, daemon=True)
     p5.start()
     p9 = threading.Thread(target=monitor_debuggers, daemon=True)
     p9.start()
     p10 = threading.Thread(target=monitor_debugger_peb, daemon=True)
     p10.start()
+    p11 = threading.Thread(target=monitor_memory_access, daemon=True)
+    p11.start()
+
+
 
 
 
@@ -475,7 +521,12 @@ def protection_started_check():
                 protection_started_num = 0
                 os._exit(0)
                 sys.exit(1)
+            if not p11.is_alive():
+                protection_started_num = 0
+                os._exit(0)
+                sys.exit(1)
         except Exception:
+            os._exit(0)
             sys.exit(1)
 
 
@@ -550,3 +601,85 @@ def start():
     protect_check_thread.start()
     start_last_wall()
     os.system("cls")
+
+
+def test_protection():
+    global protection_started_num, sus_num
+    if not p1.is_alive():
+        protection_started_num = 0
+        sus_num = 1
+        os._exit(0)
+        sys.exit(1)
+        last_wall()
+    if not p2.is_alive():
+        protection_started_num = 0
+        sus_num = 1
+        os._exit(0)
+        sys.exit(1)
+        last_wall()
+    if not p3.is_alive():
+        protection_started_num = 0
+        sus_num = 1
+        os._exit(0)
+        sys.exit(1)
+        last_wall()
+    if not p4.is_alive():
+        protection_started_num = 0
+        sus_num = 1
+        os._exit(0)
+        sys.exit(1)
+        last_wall()
+    if not p5.is_alive():
+        protection_started_num = 0
+        sus_num = 1
+        os._exit(0)
+        sys.exit(1)
+        last_wall()
+    if not p6.is_alive():
+        protection_started_num = 0
+        sus_num = 1
+        os._exit(0)
+        sys.exit(1)
+        last_wall()
+    if not p7.is_alive():
+        protection_started_num = 0
+        sus_num = 1
+        os._exit(0)
+        sys.exit(1)
+        last_wall()
+    if not p8.is_alive():
+        protection_started_num = 0
+        sus_num = 1
+        os._exit(0)
+        sys.exit(1)
+        last_wall()
+    if not p9.is_alive():
+        protection_started_num = 0
+        sus_num = 1
+        os._exit(0)
+        sys.exit(1)
+        last_wall()
+    if not p10.is_alive():
+        protection_started_num = 0
+        sus_num = 1
+        os._exit(0)
+        sys.exit(1)
+        last_wall()
+    if not p11.is_alive():
+        protection_started_num = 0
+        sus_num = 1
+        os._exit(0)
+        sys.exit(1)
+        last_wall()
+    if not protect_check_thread.is_alive():
+        protection_started_num = 0
+        sus_num = 1
+        os._exit(0)
+        sys.exit(1)
+        last_wall()
+
+
+
+
+if __name__ == "__main__":
+    sus_num = 0
