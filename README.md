@@ -18,6 +18,8 @@ Compilation: if you need to compile this project, then I advise you to use the N
 You just need to enter the folder in which the source files are located 
 in the console and write the command: nuitka --standalone --windows-uac-admin --follow-imports --include-data-file=AD.so=. YOUR_MAIN_FILE_NAME.py
 
+Well, if you want your project to be opened in 15 seconds, use pyinstaller and the --add-binary="path" flag
+
 Interesting fact: if you add the --onefile flag to compile everything 
 into 1 file and then upload this file to virustotal, 
 you will get a list of ~20 antiviruses that you should not buy (they will detect it as a virus). 
