@@ -89,6 +89,7 @@ def check_timing():
 
 
 
+
 def check_virtualization():
     global sus_num
     while True:
@@ -404,8 +405,23 @@ def detected_sus_thing():
 
 
 
+ADlib = ctypes.CDLL("./AD.so") #Don't forget to compile the library into .so; command: gcc -fPIC -shared -o AD.so AD.c -lntdll
+def C_protections():
+    while True:
+        if ADlib.debug_check() == 1:
+            detected_sus_thing()
+            exit_bridge_for_MD()
+        elif ADlib.debug_check() == 0:
+            pass
+        time.sleep(1)
+
+
+
+
+
+
 def start_pfd():
-    global p1, p2, p3, p4, p5, p6, p7, p8, p9, p10
+    global p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11
     p1 = threading.Thread(target=scan_for_sus_process, daemon=True)
     p1.start()
     p2 = threading.Thread(target=check_sys_debugger, daemon=True)
@@ -426,6 +442,8 @@ def start_pfd():
     p9.start()
     p10 = threading.Thread(target=monitor_debugger_peb, daemon=True)
     p10.start()
+    p11 = threading.Thread(target=C_protections, daemon=True)
+    p11.start()
 
 
 
@@ -472,6 +490,10 @@ def protection_started_check():
                 os._exit(0)
                 sys.exit(1)
             if not p10.is_alive():
+                protection_started_num = 0
+                os._exit(0)
+                sys.exit(1)
+            if not p11.is_alive():
                 protection_started_num = 0
                 os._exit(0)
                 sys.exit(1)
@@ -620,6 +642,3 @@ def test_protection():
         os._exit(0)
         sys.exit(1)
         last_wall()
-
-if __name__ == "__main__":
-    sus_num = 0
