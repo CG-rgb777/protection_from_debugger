@@ -6,7 +6,7 @@ For better protection, it's better not to use exec and eval, but if you really n
 I strongly recommend that you do not disable all levels of protection or disable lines of code that terminate the program, 
 doing so may activate protection that shuts down your computer or fills RAM with “garbage”.
 
-Protection against Windows debugger, VEH debugger, Windows Sandbox. 
+Protection against Windows debugger, VEH debugger, Windows Sandbox(Virtualization). 
 
 To enable protection in your project, simply import the upfd file and call the upfd.start() function
 To check if all protection is working, call the upfd.test_protection() function
