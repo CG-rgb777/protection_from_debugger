@@ -7,7 +7,9 @@ I strongly recommend that you do not disable all levels of protection or disable
 doing so may activate protection that shuts down your computer or fills RAM with “garbage”.
 
 Protection against Windows debugger, VEH debugger, Windows Sandbox. 
-But in cheat engine there is a function at activation of which Windows debugger is hidden and from this I have not yet invented protection.
 
 To enable protection in your project, simply import the upfd file and call the upfd.start() function
 To check if all protection is working, call the upfd.test_protection() function
+
+Also remember to compile the C file correctly using this command: gcc -fPIC -shared -o AD.so AD.c -lntdll -lpsapi
+Instead of "AD" you can put your own file name, but then change the path in the code of the file upfd.py
