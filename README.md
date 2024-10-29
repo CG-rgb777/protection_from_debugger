@@ -25,3 +25,5 @@ into 1 file and then upload this file to virustotal,
 you will get a list of ~20 antiviruses that you should not buy (they will detect it as a virus). 
 Although even without this flag some antiviruses will identify your file as a virus, if you want to increase the “trust factor” of the file, digitally sign it (there are guides on the Internet that show how to do this for free).
 If you have nothing to do at all, then send your file for analysis to a company that owns an antivirus that identified your file as a virus.
+
+And if you need normal protection only against debuggers, then the AD.c file is enough for you.
