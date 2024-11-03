@@ -405,50 +405,35 @@ def detected_sus_thing():
 
 
 
-ADlib = ctypes.CDLL("./AD.so") #Don't forget to compile the library into .so; command: gcc -fPIC -shared -o AD.so AD.c -lntdll
-def C_protections():
-    while True:
-        if ADlib.debug_check() == 1:
-            detected_sus_thing()
-            exit_bridge_for_MD()
-        elif ADlib.debug_check() == 0:
-            pass
-        time.sleep(1)
-
-
-
-
-
 
 def start_pfd():
-    global p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11
-    p1 = threading.Thread(target=scan_for_sus_process, daemon=True)
+    global p1, p2, p3, p4, p5, p6, p7, p8, p9, p10
+    p1 = threading.Thread(target=scan_for_sus_process)
     p1.start()
-    p2 = threading.Thread(target=check_sys_debugger, daemon=True)
+    p2 = threading.Thread(target=check_sys_debugger)
     p2.start()
-    p3 = threading.Thread(target=check_ctypes_debugger, daemon=True)
+    p3 = threading.Thread(target=check_ctypes_debugger)
     p3.start()
-    p4 = threading.Thread(target=check_timing, daemon=True)
+    p4 = threading.Thread(target=check_timing)
     p4.start()
-    p6 = threading.Thread(target=check_simulation, daemon=True)
-    p6.start()
-    p7 = threading.Thread(target=detected_sus_thing, daemon=True)
-    p7.start()
-    p8 = threading.Thread(target=sanbox_user_check, daemon=True)
-    p8.start()
-    p5 = threading.Thread(target=check_virtualization, daemon=True)
+    p5 = threading.Thread(target=check_virtualization)
     p5.start()
-    p9 = threading.Thread(target=monitor_debuggers, daemon=True)
+    p6 = threading.Thread(target=check_simulation)
+    p6.start()
+    p7 = threading.Thread(target=detected_sus_thing)
+    p7.start()
+    p8 = threading.Thread(target=sanbox_user_check)
+    p8.start()
+    p9 = threading.Thread(target=monitor_debuggers)
     p9.start()
-    p10 = threading.Thread(target=monitor_debugger_peb, daemon=True)
+    p10 = threading.Thread(target=monitor_debugger_peb)
     p10.start()
-    p11 = threading.Thread(target=C_protections, daemon=True)
-    p11.start()
 
 
 
 
 def protection_started_check():
+    global protection_started_num
     while True:
         protection_started_num = 1
         time.sleep(10)
@@ -490,10 +475,6 @@ def protection_started_check():
                 os._exit(0)
                 sys.exit(1)
             if not p10.is_alive():
-                protection_started_num = 0
-                os._exit(0)
-                sys.exit(1)
-            if not p11.is_alive():
                 protection_started_num = 0
                 os._exit(0)
                 sys.exit(1)
@@ -565,80 +546,10 @@ def start_last_wall():
 
 
 def start():
-    global protect_check_thread
+    global protect_check_thread, ADlib
     start_pfd()
-    os.system("cls")
-    protect_check_thread = threading.Thread(target=protection_started_check)
+    #os.system("cls")
+
+    protect_check_thread = threading.Thread(target=protection_started_check)   
     protect_check_thread.start()
     start_last_wall()
-    os.system("cls")
-
-
-def test_protection():
-    global protection_started_num, sus_num
-    if not p1.is_alive():
-        protection_started_num = 0
-        sus_num = 1
-        os._exit(0)
-        sys.exit(1)
-        last_wall()
-    if not p2.is_alive():
-        protection_started_num = 0
-        sus_num = 1
-        os._exit(0)
-        sys.exit(1)
-        last_wall()
-    if not p3.is_alive():
-        protection_started_num = 0
-        sus_num = 1
-        os._exit(0)
-        sys.exit(1)
-        last_wall()
-    if not p4.is_alive():
-        protection_started_num = 0
-        sus_num = 1
-        os._exit(0)
-        sys.exit(1)
-        last_wall()
-    if not p5.is_alive():
-        protection_started_num = 0
-        sus_num = 1
-        os._exit(0)
-        sys.exit(1)
-        last_wall()
-    if not p6.is_alive():
-        protection_started_num = 0
-        sus_num = 1
-        os._exit(0)
-        sys.exit(1)
-        last_wall()
-    if not p7.is_alive():
-        protection_started_num = 0
-        sus_num = 1
-        os._exit(0)
-        sys.exit(1)
-        last_wall()
-    if not p8.is_alive():
-        protection_started_num = 0
-        sus_num = 1
-        os._exit(0)
-        sys.exit(1)
-        last_wall()
-    if not p9.is_alive():
-        protection_started_num = 0
-        sus_num = 1
-        os._exit(0)
-        sys.exit(1)
-        last_wall()
-    if not p10.is_alive():
-        protection_started_num = 0
-        sus_num = 1
-        os._exit(0)
-        sys.exit(1)
-        last_wall()
-    if not protect_check_thread.is_alive():
-        protection_started_num = 0
-        sus_num = 1
-        os._exit(0)
-        sys.exit(1)
-        last_wall()
