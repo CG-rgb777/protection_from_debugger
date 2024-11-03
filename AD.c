@@ -6,7 +6,6 @@
 
 
 BOOL DebuggerCheck_1();
-int OutputThread();
 BOOL CheckIfModuleLoaded_1();
 BOOL CheckIfModuleLoaded_2();
 
