@@ -13,7 +13,6 @@ doing so may activate protection that shuts down your computer or fills RAM with
 Protection against Windows debugger, VEH debugger, Windows Sandbox(Virtualization) and almost all debuggers from cheat engine version 7.5.
 
 To enable protection in your project, simply import the upfd file and call the upfd.start() function
-To check if all protection is working, call the upfd.test_protection() function
 
 Also remember to compile the C file correctly using this command: gcc -fPIC -shared -o AD.so AD.c -lntdll
 Instead of "AD" you can put your own file name, but then change the path in the code of the file upfd.py
