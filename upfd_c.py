@@ -1,6 +1,7 @@
 import threading
 import ctypes
 import time
+import os
 
 
 
@@ -12,6 +13,7 @@ def start_on():
             ADlib = ctypes.CDLL("./AD.so")
         except:
             print("The protection file cannot be found!\n")
+            os._exit(0)
     while True:
         try:
             if ADlib.debug_check() == 1:
