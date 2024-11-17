@@ -49,7 +49,7 @@ BOOL DebuggerCheck_1() {
     CONTEXT context;
     context.ContextFlags = CONTEXT_DEBUG_REGISTERS;
     if (GetThreadContext(GetCurrentThread(), &context)) {
-        if (context.Dr0 || context.Dr1 || context.Dr2 || context.Dr3 || context.Dr6 || context.Dr7) {
+        if (context.Dr0 || context.Dr1 || context.Dr2 || context.Dr3) {
             return TRUE;
         }
     }
