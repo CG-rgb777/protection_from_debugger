@@ -7,7 +7,7 @@ import os
 
 def start_on():
     try:
-        ADlib = ctypes.CDLL("AD.so") #Don't forget to compile the library into .so; command: gcc -fPIC -shared -o AD.so AD.c -lntdll
+        ADlib = ctypes.CDLL("AD.so") #Don't forget to compile the library into .so; command: gcc -fPIC -shared -o AD.so AD.c
     except:
         try:
             ADlib = ctypes.CDLL("./AD.so")
