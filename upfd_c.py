@@ -12,7 +12,6 @@ def start_on():
         try:
             ADlib = ctypes.CDLL("./AD.so")
         except:
-            print("The protection file cannot be found!\n")
             os._exit(0)
     while True:
         try:
