@@ -25,7 +25,8 @@ When compiling with protection written in C, add the flag: "--include-data-file=
 
 An example of what I wrote: "nuitka --standalone --onefile --onefile-no-compression --windows-uac-admin --follow-imports --include-data-file=AD.so=. test.py"
 
-Well, if you want your project to be opened in 15 seconds, use pyinstaller and the --add-binary="path" flag
+Well, if you want your project to be opened in 15 seconds, use pyinstaller and the --add-binary="path" flag.
+If you really want to, then use auto-py-to-exe, it’s a handy thing
 
 Interesting fact: if you add the --onefile flag to compile everything 
 into 1 file and then upload this file to virustotal, 
