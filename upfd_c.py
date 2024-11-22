@@ -27,6 +27,3 @@ def start_on():
 
 def start():
     threading.Thread(target=start_on).start()
-
-
-start()
