@@ -1,128 +1,82 @@
-#include <stdio.h>
 #include <windows.h>
-#include <winternl.h>
-#include <stdbool.h>
+#include <stdio.h>
 
+int check_is_debugger_present() {
+    return IsDebuggerPresent() ? 1 : 0;
+}
 
-
-BOOL DebuggerCheck_1();
-BOOL CheckIfModuleLoaded_1();
-BOOL CheckIfModuleLoaded_2();
-
-
-
-BOOL DebuggerCheck_1() {
-    if (IsDebuggerPresent()) {
-        return TRUE;
+int check_remote_debugger() {
+    BOOL debugger_present = FALSE;
+    if (CheckRemoteDebuggerPresent(GetCurrentProcess(), &debugger_present)) {
+        return debugger_present ? 1 : 0;
     }
+    return 0;
+}
 
-    PEB *pPeb = (PEB *)__readgsqword(0x60);
-    ULONG ntGlobalFlag = *(ULONG *)((BYTE *)pPeb + 0x68);
-    if (ntGlobalFlag & 0x2) {
-        return TRUE;
-    }
+int check_hardware_breakpoints() {
+    CONTEXT ctx;
+    HANDLE hThread = GetCurrentThread();
+    memset(&ctx, 0, sizeof(CONTEXT));
+    ctx.ContextFlags = CONTEXT_DEBUG_REGISTERS;
 
-
-    BOOL remoteDebuggerPresent;
-    CheckRemoteDebuggerPresent(GetCurrentProcess(), &remoteDebuggerPresent);
-    if (remoteDebuggerPresent) {
-        return TRUE;
-    }
-
-
-    HANDLE hProcess = GetCurrentProcess();
-    PROCESS_BASIC_INFORMATION pbi;
-    ULONG returnLength;
-
-
-    NtQueryInformationProcess(hProcess, ProcessBasicInformation, &pbi, sizeof(pbi), &returnLength);
-
-
-    if (pbi.PebBaseAddress) {
-        PPEB pPebInfo = pbi.PebBaseAddress;
-        ULONG ntGlobalFlagInfo = *(ULONG *)((BYTE *)pPebInfo + 0x68);
-        if (ntGlobalFlagInfo & 0x2) {
-            return TRUE;
+    if (GetThreadContext(hThread, &ctx)) {
+        if (ctx.Dr0 || ctx.Dr1 || ctx.Dr2 || ctx.Dr3) {
+            return 1;
         }
+    } else {
     }
+    return 0;
+}
 
-    CONTEXT context;
-    context.ContextFlags = CONTEXT_DEBUG_REGISTERS;
-    if (GetThreadContext(GetCurrentThread(), &context)) {
-        if (context.Dr0 || context.Dr1 || context.Dr2 || context.Dr3) {
-            return TRUE;
-        }
+int check_execution_time() {
+    LARGE_INTEGER start, end, freq;
+    if (!QueryPerformanceFrequency(&freq)) {
+        return 0;
     }
+    QueryPerformanceCounter(&start);
 
+    for (volatile int i = 0; i < 1000000; i++) {}
 
+    QueryPerformanceCounter(&end);
+    double elapsed_time = (double)(end.QuadPart - start.QuadPart) / freq.QuadPart;
 
-    HANDLE hToken;
-    TOKEN_PRIVILEGES tp;
-    DWORD dwSize;
-
-    if (OpenProcessToken(GetCurrentProcess(), TOKEN_QUERY, &hToken)) {
-        GetTokenInformation(hToken, TokenPrivileges, NULL, 0, &dwSize);
-        GetTokenInformation(hToken, TokenPrivileges, &tp, dwSize, &dwSize);
-        for (DWORD i = 0; i < tp.PrivilegeCount; i++) {
-            if (tp.Privileges[i].Attributes & SE_PRIVILEGE_ENABLED) {
-                if (tp.Privileges[i].Luid.LowPart == 20) {
-                    CloseHandle(hToken);
-                    return TRUE;
-                }
-            }
-        }
-        CloseHandle(hToken);
-    }
-
-    return FALSE;
+    return elapsed_time > 0.05 ? 1 : 0; 
 }
 
 
-BOOL CheckIfModuleLoaded_1() {
+
+
+
+int CheckIfModuleLoaded_1() {
     const char *moduleName = "vehdebug-x86_64.dll";
     HMODULE hModule = GetModuleHandleA(moduleName);
     if (hModule != NULL) {
-        return TRUE;
+        return 1;
     } else {
-        return FALSE;
+        return 0;
     }
 }
 
-
-
-BOOL CheckIfModuleLoaded_2() {
+int CheckIfModuleLoaded_2() {
     const char *moduleName = "allochook-x86_64.dll";
     HMODULE hModule = GetModuleHandleA(moduleName);
     if (hModule != NULL) {
-        return TRUE;
+        return 1;
     } else {
-        return FALSE;
-    }
-}
-
-
-
-
-int debug_check() {
-    while (1) {
-
-        if (CheckIfModuleLoaded_1()) {
-            return 1;
-        }
-
-        if (CheckIfModuleLoaded_2()) {
-            return 1;
-        }
-
-        if (DebuggerCheck_1()) {
-            return 1;
-        }
-
         return 0;
-        Sleep(666);
     }
 }
 
 
 
-//gcc -fPIC -shared -o AD.so AD.c -lntdll         - .so
+int detect_debugger() {
+    if (check_is_debugger_present() ||
+        check_remote_debugger() ||
+        check_hardware_breakpoints() ||
+        check_execution_time() ||
+        CheckIfModuleLoaded_1() ||
+        CheckIfModuleLoaded_2()) {
+        return 1;
+    }
+    return 0;
+}
