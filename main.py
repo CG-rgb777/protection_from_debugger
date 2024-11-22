@@ -11,9 +11,6 @@ upfd.start()
 #Enabling protection written only in C
 upfd_c.start()
 
-#You will have to choose one of these, 
-#because for some reason they conflict :(
-#I'm trying to solve this problem.
 
 
 
