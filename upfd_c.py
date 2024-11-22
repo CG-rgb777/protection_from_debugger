@@ -1,6 +1,6 @@
+import time
 import threading
 import ctypes
-import time
 import os
 
 
@@ -16,14 +16,17 @@ def start_on():
             os._exit(0)
     while True:
         try:
-            if ADlib.debug_check() == 1:
-                print("detect")
-            else:
-                print(0)
+            if ADlib.detect_debugger() == 1:
+                os._exit(0)
+            elif ADlib.detect_debugger() == 0:
+                pass
         except Exception as e:
-            print(e)
+            os._exit(0)
         time.sleep(1)
 
 
 def start():
     threading.Thread(target=start_on).start()
+
+
+start()
