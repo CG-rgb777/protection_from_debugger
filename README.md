@@ -20,8 +20,8 @@ Also remember to compile the C file correctly using this command: gcc -fPIC -sha
 Instead of "AD" you can put your own file name, but then change the path in the code of the file upfd_с.py
 
 Compilation: if you need to compile this project, then I advise you to use the Nuitka library. 
-When compiling with protection written in python, add a flags: "--include-data-file=AD.so=." and "--follow-imports"
-When compiling with protection written in C, add the flag: "--follow-imports"
+When compiling with protection written in python, add a flags: "--follow-imports"
+When compiling with protection written in C, add the flag: "--include-data-file=AD.so=." and "--follow-imports"
 
 An example of what I wrote: "nuitka --standalone --onefile --onefile-no-compression --windows-uac-admin --follow-imports --include-data-file=AD.so=. test.py"
 
