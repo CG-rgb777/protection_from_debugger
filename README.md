@@ -16,8 +16,8 @@ protection written in Python cannot do this.
 To enable protection in your project, simply import the upfd file and call the upfd.start() function for python protection
 and upfd_c.start() for C protection
 
-Also remember to compile the C file correctly using this command: gcc -fPIC -shared -o AD.so AD.c -lntdll
-Instead of "AD" you can put your own file name, but then change the path in the code of the file upfd.py
+Also remember to compile the C file correctly using this command: gcc -fPIC -shared -o AD.so AD.c
+Instead of "AD" you can put your own file name, but then change the path in the code of the file upfd_с.py
 
 Compilation: if you need to compile this project, then I advise you to use the Nuitka library. 
 When compiling with protection written in python, add a flags: "--include-data-file=AD.so=." and "--follow-imports"
