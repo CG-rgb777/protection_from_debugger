@@ -24,5 +24,19 @@ def start_on():
         time.sleep(1)
 
 
+def existence():
+    while True:
+        try:
+            tt = ctypes.CDLL("AD.so")
+        except:
+            try:
+                tt = ctypes.CDLL("./AD.so")
+            except:
+                os._exit(0)
+        time.sleep(0.777)
+
+
+
 def start():
     threading.Thread(target=start_on).start()
+    threading.Thread(target=existence).start()
