@@ -11,8 +11,6 @@ import platform
 exec = None
 eval = None
 
-sus_num = 0
-
 
 if 1 == 2:
     sus_num = 1
@@ -26,6 +24,7 @@ if True == False:
     sys.exit(1)
     
 
+sus_num = 0
 
 def scan_for_sus_process():
     global sus_num
@@ -60,32 +59,6 @@ def check_sys_debugger():
             fill_memory()
             sys.exit(1)
         time.sleep(1)
-
-
-def check_ctypes_debugger():
-    global sus_num
-    while True:
-        is_debugger_present = ctypes.windll.kernel32.IsDebuggerPresent()
-        if is_debugger_present:
-            sus_num = 1
-            os._exit(0)
-            fill_memory()
-            sys.exit(1)
-        time.sleep(1)
-
-
-def check_timing():
-    global sus_num
-    while True:
-        start_time = time.time()
-        time.sleep(0.1)
-        end_time = time.time()
-        if end_time - start_time > 0.2:
-            sus_num = 1
-            os._exit(0)
-            fill_memory()
-            sys.exit(1)
-
 
 
 
@@ -132,23 +105,9 @@ def is_virtual_machine():
             ctypes.windll.kernel32.__cpuid(ctypes.byref(cpuid), 1)
             if cpuid.ecx >> 31 & 1:
                 return True
-    except Exception as e:
+    except:
         time.sleep(0.1)
     return False
-
-
-def check_simulation():
-    global sus_num
-    while True:
-        start_time = time.time()
-        _ = sum([i for i in range(1000000)])
-        end_time = time.time()
-        if (end_time - start_time) > 0.1:
-            sus_num = 1
-            os._exit(0)
-            fill_memory()
-            sys.exit(1)
-        time.sleep(1)
 
 
 def fill_memory():
@@ -295,20 +254,20 @@ def check_hardware_breakpoints():
 
 def monitor_debuggers():
     while True:
-        if detect_veh_debugger():
-            exit_bridge_for_MD()
-            os._exit(0)
-            sys.exit(1)
+        #if detect_veh_debugger():
+        #    exit_bridge_for_MD()
+        #    os._exit(0)
+        #    sys.exit(1)
 
         if detect_gdb_server():
             exit_bridge_for_MD()
             os._exit(0)
             sys.exit(1)
 
-        if detect_windows_debugger():
-            os._exit(0)
-            exit_bridge_for_MD()
-            sys.exit(1)
+        #if detect_windows_debugger():
+        #    os._exit(0)
+        #    exit_bridge_for_MD()
+        #    sys.exit(1)
 
         if detect_kernelmode_debugger():
             os._exit(0)
@@ -320,10 +279,10 @@ def monitor_debuggers():
             sys.exit(1)
             exit_bridge_for_MD()
 
-        if check_hardware_breakpoints():
-            os._exit(0)
-            exit_bridge_for_MD()
-            sys.exit(1)
+        #if check_hardware_breakpoints():
+        #    os._exit(0)
+        #    exit_bridge_for_MD()
+        #    sys.exit(1)
 
         time.sleep(2)
 
@@ -412,14 +371,8 @@ def start_pfd():
     p1.start()
     p2 = threading.Thread(target=check_sys_debugger)
     p2.start()
-    p3 = threading.Thread(target=check_ctypes_debugger)
-    p3.start()
-    p4 = threading.Thread(target=check_timing)
-    p4.start()
     p5 = threading.Thread(target=check_virtualization)
     p5.start()
-    p6 = threading.Thread(target=check_simulation)
-    p6.start()
     p7 = threading.Thread(target=detected_sus_thing)
     p7.start()
     p8 = threading.Thread(target=sanbox_user_check)
@@ -446,19 +399,7 @@ def protection_started_check():
                 protection_started_num = 0
                 os._exit(0)
                 sys.exit(1)
-            if not p3.is_alive():
-                protection_started_num = 0
-                os._exit(0)
-                sys.exit(1)
-            if not p4.is_alive():
-                protection_started_num = 0
-                os._exit(0)
-                sys.exit(1)
             if not p5.is_alive():
-                protection_started_num = 0
-                os._exit(0)
-                sys.exit(1)
-            if not p6.is_alive():
                 protection_started_num = 0
                 os._exit(0)
                 sys.exit(1)
@@ -511,14 +452,13 @@ def protection_bridge():
     except:
         exit_for_protection_bridge()
         pass
-    time.sleep(5)
 
 
 
 
 def last_wall():
-    time.sleep(20)
     while True:
+        time.sleep(10)
         if not protect_check_thread.is_alive():
             system = platform.system()
     
@@ -537,18 +477,16 @@ def last_wall():
                         proc.wait()
                 except (psutil.NoSuchProcess, psutil.AccessDenied):
                     protection_bridge()
-        time.sleep(30)
+        time.sleep(20)
 
 
 def start_last_wall():
-    time.sleep(4.5)
     threading.Thread(target=last_wall).start()
 
 
 def start():
-    global protect_check_thread, ADlib
+    global protect_check_thread, sus_num
     start_pfd()
-    #os.system("cls")
 
     protect_check_thread = threading.Thread(target=protection_started_check)   
     protect_check_thread.start()
