@@ -6,8 +6,6 @@ Although the name of the program is ultimate_protect_from_debuggers, the protect
 You can choose between protection written entirely in Python and protection written entirely in C.
 Or choose both (I recommend)
 
-For better protection, it's better not to use exec and eval, but if you really need them, just remove lines 11 and 12 from the code.
-
 I strongly recommend that you do not disable all levels of protection or disable lines of code that terminate the program, 
 doing so may activate protection that shuts down your computer or fills RAM with “garbage”.
 
