@@ -12,6 +12,7 @@ I strongly recommend that you do not disable all levels of protection or disable
 doing so may activate protection that shuts down your computer or fills RAM with “garbage”.
 
 Protection against Windows debugger, VEH debugger, Windows Sandbox(Virtualization) and almost all debuggers from cheat engine version 7.5.
+Protection against freezing or program slowdown.
 The C version of protection can detect debuggers even if you enable the function of hiding the debugger in the cheat engine settings, 
 protection written in Python cannot do this.
 
