@@ -25,6 +25,7 @@ When compiling with protection written in python, add a flags: "--follow-imports
 When compiling with protection written in C, add the flag: "--include-data-file=AD.so=." and "--follow-imports"
 
 An example of what I wrote: "nuitka --standalone --onefile --onefile-no-compression --windows-uac-admin --follow-imports --include-data-file=AD.so=. test.py"
+If you need your antivirus program not to be marked as a virus, then do not use the flags: "--standalone", "--onefile"
 
 Well, if you want your project to be opened in 15 seconds, use pyinstaller and the --add-binary="path" flag.
 If you really want to, then use auto-py-to-exe, it’s a handy thing
